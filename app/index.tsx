@@ -10,7 +10,7 @@ import { RootState } from '../redux/store';
 export default function App() {
 
 
-  const { userData, lastName } = useSelector((state: RootState) => state.userData);
+  const { userData } = useSelector((state: RootState) => state.userData);
 
 
   const renderItems = ({ item }: { item: UserIterface }) => {
@@ -22,7 +22,7 @@ export default function App() {
             <Image className='w-20 h-20 rounded-full' source={{ uri: item.img }} />
             <View className='flex-col pl-3'>
               <Text className='text-3xl'>{item.name}</Text>
-              <Text className='text-gray-600'>{item.email}</Text>
+              {/* <Text className='text-gray-600'>{item.email}</Text> */}
               <Text>{item.id}</Text>
             </View>
           </View>
@@ -34,7 +34,7 @@ export default function App() {
   return (
 
     <View className='flex-1 bg-white pl-2'>
-      <Text className='mt-10 text-2xl font-bold pb-5'>Listado de {lastName}</Text>
+      <Text className='mt-10 text-2xl font-bold pb-5'>Listado de Cosecheros</Text>
       <FlatList
         data={userData}
         renderItem={renderItems}

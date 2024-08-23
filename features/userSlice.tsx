@@ -1,19 +1,19 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { userData } from '../data/data';
-import uuid from 'react-native-uuid';
 
-
+import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
+import { db } from "../firebase/firebaseConfig";
+import { UserIterface } from "../interfaces/userInterfaces";
 
 
 interface UserState {
     userData: typeof userData;
-    lastName: string;
+    isLoading: boolean;
 }
 
 const initialState: UserState = {
     userData,
-    lastName: "Robin"
+    isLoading: false,
 };
 
 export const userSlice = createSlice({
@@ -24,20 +24,33 @@ export const userSlice = createSlice({
             state.userData = action.payload;
         },
 
-        add: (state, action: PayloadAction<string>) => {
-
-            // console.log("jajaja");
-            console.log("Hola", action.payload);
-            state.userData.push({
-                id: uuid.v4() as string,
-                name: action.payload,
-                email: "newuser@example.com",
-                // birthdate: new Date().toISOString(),
-                img: "https://images.ecestaticos.com/0NSU6CTpIsbkQSi6hjq36RSdxTo=/0x0:0x0/1200x900/filters:fill(white):format(jpg)/f.elconfidencial.com%2Foriginal%2F769%2Ff6d%2Fe65%2F769f6de657b8d14f063b2c640a863474.jpg",
-            });
+        add: (state, action: PayloadAction<UserIterface>) => {
+            state.isLoading = true;
+            addCity(action.payload);
+            state.isLoading = false;
         }
     },
 });
+
+
+
+const addCity = async (user: UserIterface) => {
+    console.log("Hola");
+
+    try {
+        await setDoc(doc(collection(db, 'users'), user.id), {
+            id: user.id,
+            name: user.name,
+            birthdate: user.birthdate,
+            province: user.province,
+            img: user.img,
+        });
+        console.log('Document successfully written!');
+    } catch (error) {
+        console.error('Error writing document: ', error);
+        throw error;
+    }
+}
 
 // Exporta las acciones generadas
 export const { setUserData, add } = userSlice.actions;
