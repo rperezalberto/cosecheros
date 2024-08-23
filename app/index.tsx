@@ -1,29 +1,40 @@
 import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { userData } from '../data/data';
-import { User } from '../interfaces/userInterfaces';
+import { UserIterface } from '../interfaces/userInterfaces';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
+
+
 export default function App() {
 
 
-  const renderItems = ({ item }: { item: User }) => {
+  const { userData, lastName } = useSelector((state: RootState) => state.userData);
+
+
+  const renderItems = ({ item }: { item: UserIterface }) => {
     return (
-      <View className='flex-row items-center pb-5'>
-        <Image className='w-20 h-20 rounded-full' source={{ uri: item.img }} />
-        <View className='flex-col pl-3'>
-          <Text className='text-3xl'>{item.name}</Text>
-          <Text className='text-gray-600'>{item.email}</Text>
-          <Text>{new Date(item.birthdate).toLocaleDateString()}</Text>
-        </View>
-      </View>
+
+      <Link href={{ pathname: "/detail", params: { id: item.id } }} asChild>
+        <Pressable>
+          <View className='flex-row items-center pb-5'>
+            <Image className='w-20 h-20 rounded-full' source={{ uri: item.img }} />
+            <View className='flex-col pl-3'>
+              <Text className='text-3xl'>{item.name}</Text>
+              <Text className='text-gray-600'>{item.email}</Text>
+              <Text>{item.id}</Text>
+            </View>
+          </View>
+        </Pressable>
+      </Link>
     );
   };
 
-
   return (
+
     <View className='flex-1 bg-white pl-2'>
-      <Text className='mt-10 text-2xl font-bold pb-5'>Listado de Cosechero</Text>
+      <Text className='mt-10 text-2xl font-bold pb-5'>Listado de {lastName}</Text>
       <FlatList
         data={userData}
         renderItem={renderItems}
@@ -40,6 +51,7 @@ export default function App() {
       </Pressable>
       <StatusBar style="auto" />
     </View>
+
   );
 }
 

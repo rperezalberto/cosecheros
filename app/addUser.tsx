@@ -4,9 +4,11 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useDispatch } from 'react-redux';
+import { add } from '../features/userSlice';
 
 
-const addUser = () => {
+const addUser = (text: string) => {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(null);
 
@@ -19,11 +21,15 @@ const addUser = () => {
         { label: 'Python', value: 'python' },
     ]);
 
+
+    const [name, setName] = useState("");
+
     const showDatepicker = () => {
         setShow(true);
     };
 
 
+    const dispatch = useDispatch();
 
     return (
         <ScrollView className='flex-1 bg-white p-5'>
@@ -37,7 +43,8 @@ const addUser = () => {
 
                 <View className='pt-5'>
                     <Text style={[styles.title, { alignSelf: 'flex-start', paddingVertical: 5, marginTop: 10 }]}>Name:</Text>
-                    <TextInput style={styles.input} />
+                    <TextInput style={styles.input} onChangeText={(text) => setName(text)} // Utiliza onChangeText
+                    />
                     <Text style={[styles.title, { alignSelf: 'flex-start', paddingVertical: 5, marginTop: 10 }]}>Birthdate:</Text>
                     <TextInput style={styles.input} />
 
@@ -57,7 +64,7 @@ const addUser = () => {
                 </View>
 
 
-                <Text style={[styles.title, { alignSelf: 'flex-start', paddingVertical: 5, marginTop: 10 }]}>Birthdate:</Text>
+                {/* <Text style={[styles.title, { alignSelf: 'flex-start', paddingVertical: 5, marginTop: 10 }]}>Birthdate:</Text>
                 <View>
                     <TextInput
                         style={styles.input}
@@ -73,9 +80,11 @@ const addUser = () => {
                         // onChange={onChange}
                         />
                     )}
-                </View>
+                </View> */}
             </View>
-            <Pressable style={styles.btn}>
+            <Pressable style={styles.btn} onPress={() => {
+                dispatch(add(name));
+            }}>
                 <Text style={{ color: "white", fontWeight: "900", fontSize: 16 }}>Send</Text>
             </Pressable>
         </ScrollView>

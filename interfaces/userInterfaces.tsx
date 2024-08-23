@@ -1,8 +1,8 @@
-export interface User {
-    id: number;
+export interface UserIterface {
+    id: string;
     name: string;
     email: string;
-    birthdate: Date;
+    // birthdate: string;
     img: string;
 }
 
