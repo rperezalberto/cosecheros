@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -7,7 +7,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { collection, onSnapshot } from 'firebase/firestore';
-import { db, storageCon } from '../firebase/firebaseConfig'; // Asegúrate de importar la configuración de Firebase
+import { db, storageCon } from '../firebase/firebaseConfig';
 import { setUserData } from '../features/userSlice';
 import { getDownloadURL, ref } from "firebase/storage";
 
@@ -35,7 +35,7 @@ export default function App() {
                 return fetchImageUrlWithRetries(retries + 1);
               } else {
                 console.error("Error al obtener la URL de la imagen:", error);
-                return null;
+                return null; // Fallback si no se puede obtener la URL
               }
             }
           };
@@ -55,15 +55,21 @@ export default function App() {
     return () => unsub();
   }, [dispatch]);
 
-
   const renderItems = ({ item }: { item: UserIterface }) => {
     return (
-      <Link href={{ pathname: "/detail", params: { id: item.id } }} asChild>
-        <Pressable>
+      <Link
+        href={{
+          pathname: "/detail",
+          params: { user: JSON.stringify(item) },
+        }}
+        asChild
+      >
+        <Pressable accessibilityLabel={`Cosechero ${item.name}`}>
           <View className='flex-row items-center pb-5'>
             <Image
-              style={styles.image} // Usando StyleSheet para el estilo
+              style={styles.image}
               source={item.img ? { uri: item.img } : require("../assets/sheldon.png")}
+              accessibilityLabel={`Imagen de ${item.name}`}
             />
             <View className='flex-col pl-3'>
               <Text style={styles.name}>{item.name}</Text>
@@ -82,9 +88,10 @@ export default function App() {
         data={userData}
         renderItem={renderItems}
         keyExtractor={(item) => item.id.toString()}
+        ListEmptyComponent={() => <Text>No hay datos disponibles</Text>}
       />
 
-      <Pressable style={styles.addButton}>
+      <Pressable style={styles.addButton} accessibilityLabel="Agregar nuevo cosechero">
         <Link href={"addUser"}>
           <View style={styles.btn}>
             <FontAwesome6 name="add" size={24} color="white" />

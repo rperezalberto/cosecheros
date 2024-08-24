@@ -21,6 +21,14 @@ const Rootayout = () => {
                         backgroundColor: "transparent"
                     },
                 }} />
+                <Stack.Screen name="detail" options={{
+                    title: "Detail Cosechero",
+                    headerTitleAlign: 'center',
+                    headerShadowVisible: false,
+                    headerStyle: {
+                        backgroundColor: "transparent"
+                    },
+                }} />
             </Stack>
 
         </Provider>

@@ -1,14 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { userData } from '../data/data';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
 import { db } from "../firebase/firebaseConfig";
 import { UserIterface } from "../interfaces/userInterfaces";
 
-import * as ImagePicker from 'expo-image-picker';
-
 interface UserState {
-    userData: typeof userData;
+    userData: UserIterface[];
     isLoading: boolean;
     img: string;
 }
@@ -25,12 +23,14 @@ export const userSlice = createSlice({
     reducers: {
         setUserData: (state, action: PayloadAction<UserIterface[]>) => {
             state.userData = action.payload;
+            saveDataToAsyncStorage(state.userData); // Guardar en AsyncStorage
         },
-
 
         add: (state, action: PayloadAction<UserIterface>) => {
             state.isLoading = true;
+            state.userData.push(action.payload);
             addCity(action.payload);
+            saveDataToAsyncStorage(state.userData); // Guardar en AsyncStorage
             state.img = "";
             state.isLoading = false;
         },
@@ -41,17 +41,21 @@ export const userSlice = createSlice({
     },
 });
 
+// Función para guardar `userData` en AsyncStorage
+const saveDataToAsyncStorage = async (userData: UserIterface[]) => {
+    try {
+        const jsonValue = JSON.stringify(userData);
+        await AsyncStorage.setItem('@user_data', jsonValue);
+        console.log('userData guardado en AsyncStorage');
+    } catch (error) {
+        console.error('Error guardando userData en AsyncStorage', error);
+    }
+}
 
-
+// Función para agregar un nuevo usuario en Firebase Firestore
 const addCity = async (user: UserIterface) => {
     try {
-        await setDoc(doc(collection(db, 'users'), user.id), {
-            id: user.id,
-            name: user.name,
-            birthdate: user.birthdate,
-            province: user.province,
-            img: user.img,
-        });
+        await setDoc(doc(collection(db, 'users'), user.id), user);
         console.log('Document successfully written!');
     } catch (error) {
         console.error('Error writing document: ', error);
