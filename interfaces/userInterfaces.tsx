@@ -1,9 +1,9 @@
 export interface UserIterface {
     id: string;
     name: string;
-    birthdate: Date;
+    birthdate: string;
     province: string;
-    img: string;
+    img: string | null;
 }
 
 

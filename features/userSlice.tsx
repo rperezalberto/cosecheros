@@ -5,29 +5,38 @@ import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
 import { db } from "../firebase/firebaseConfig";
 import { UserIterface } from "../interfaces/userInterfaces";
 
+import * as ImagePicker from 'expo-image-picker';
 
 interface UserState {
     userData: typeof userData;
     isLoading: boolean;
+    img: string;
 }
 
 const initialState: UserState = {
     userData,
     isLoading: false,
+    img: "",
 };
 
 export const userSlice = createSlice({
     name: "userData",
     initialState,
     reducers: {
-        setUserData: (state, action: PayloadAction<typeof userData>) => {
+        setUserData: (state, action: PayloadAction<UserIterface[]>) => {
             state.userData = action.payload;
         },
+
 
         add: (state, action: PayloadAction<UserIterface>) => {
             state.isLoading = true;
             addCity(action.payload);
+            state.img = "";
             state.isLoading = false;
+        },
+
+        addImg: (state, action: PayloadAction<string>) => {
+            state.img = action.payload;
         }
     },
 });
@@ -35,8 +44,6 @@ export const userSlice = createSlice({
 
 
 const addCity = async (user: UserIterface) => {
-    console.log("Hola");
-
     try {
         await setDoc(doc(collection(db, 'users'), user.id), {
             id: user.id,
@@ -53,7 +60,7 @@ const addCity = async (user: UserIterface) => {
 }
 
 // Exporta las acciones generadas
-export const { setUserData, add } = userSlice.actions;
+export const { setUserData, add, addImg } = userSlice.actions;
 
 // Exporta el reducer generado
 export default userSlice.reducer;
