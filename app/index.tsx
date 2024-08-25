@@ -34,7 +34,6 @@ export default function App() {
               return await getDownloadURL(imageRef);
             } catch (error: any) {
               if (error.code === 'storage/object-not-found' && retries < MAX_RETRIES) {
-                console.log(`Reintentando obtener la URL... (${retries + 1}/${MAX_RETRIES})`);
                 await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
                 return fetchImageUrlWithRetries(retries + 1);
               } else {

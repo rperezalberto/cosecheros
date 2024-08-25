@@ -45,19 +45,11 @@ const addUser = () => {
 
     const uploadImgPost = async (imageUri: string) => {
         setIsImage(true);
-        console.log("Entre " + isImage);
         try {
-            console.log("Iniciando la carga de imagen...");
-
             const isImage = await LoadImg(imageUri);
-            console.log("Imagen cargada como Blob");
-
             const refDocument = ref(storageCon, 'images/' + idUser + ".png");
-
             await uploadBytes(refDocument, isImage);
-            console.log("Imagen subida correctamente");
             setIsImage(false);
-            console.log("Sali " + isImage);
 
         } catch (error) {
             console.log("Error al subir la imagen");

@@ -60,19 +60,15 @@ export const userSlice = createSlice({
         }
     },
 });
-// Función para agregar un nuevo usuario en Firebase Firestore
 const addCity = async (user: UserIterface) => {
     try {
         await setDoc(doc(collection(db, 'users'), user.id), user);
-        console.log('Document successfully written!');
     } catch (error) {
         console.error('Error writing document: ', error);
         throw error;
     }
 }
 
-
-// Función para guardar `userData` en AsyncStorage
 const saveDataToAsyncStorage = async (userData: UserIterface[]) => {
     try {
         const jsonValue = JSON.stringify(userData);
@@ -98,7 +94,6 @@ export const loadUserDataFromAsyncStorage = async (dispatch: any) => {
 const deleteCity = async (id: string) => {
     try {
         await deleteDoc(doc(db, 'users', id));
-        console.log('Documento eliminado con éxito!');
     } catch (error) {
         console.error('Error al eliminar el documento: ', error);
     }
@@ -116,7 +111,6 @@ const deleteImage = async (imgPath: string) => {
 
         const imageRef = ref(storageCon, pathToDelete);
         await deleteObject(imageRef);
-        console.log('Imagen eliminada con éxito!');
     } catch (error) {
         console.error('Error al eliminar la imagen: ', error);
     }
