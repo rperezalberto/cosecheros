@@ -9,12 +9,20 @@ const Detail = () => {
     const parsedUser = userString ? JSON.parse(userString) : null;
     const encodedUrl = parsedUser.img.replace('/o/images/', '/o/images%2F');
 
-
-    console.log('Image URL:', parsedUser?.img);
-
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Nombre: {parsedUser?.name}</Text>
+            <View className='flex-row items-center'>
+                <Text style={styles.title}>Nombre:</Text>
+                <Text className='pl-1 text-2xl text-zinc-600'>{parsedUser?.name}</Text>
+            </View>
+            <View className='flex-row items-center'>
+                <Text style={styles.title}>Provincia:</Text>
+                <Text className='pl-1 text-2xl text-zinc-600'>{parsedUser?.province}</Text>
+            </View>
+            <View className='flex-row items-center'>
+                <Text style={styles.title}>Id:</Text>
+                <Text className='pl-1 text-1xl text-zinc-600'>{parsedUser?.id}</Text>
+            </View>
             <Image
                 style={styles.image}
                 source={parsedUser?.img ? { uri: encodedUrl } : require("../assets/sheldon.png")}
@@ -28,9 +36,10 @@ export default Detail;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingHorizontal: 10,
         backgroundColor: 'white',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
     },
     title: {
         fontSize: 24,
@@ -41,6 +50,6 @@ const styles = StyleSheet.create({
         height: 600,
         marginTop: 20,
         resizeMode: "cover",
-
+        alignSelf: 'center'
     },
 });

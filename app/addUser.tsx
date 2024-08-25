@@ -23,7 +23,7 @@ const addUser = () => {
     const [name, setName] = useState("");
     const [birthdate, setBirthdate] = useState(new Date());
     const [selectedProvince, setSelectedProvince] = useState("");
-    const [isModalVisible, setModalVisible] = useState(false); // Nuevo estado para el modal
+    const [isModalVisible, setModalVisible] = useState(false);
 
     const router = useRouter();
 
@@ -68,7 +68,6 @@ const addUser = () => {
     const { isLoading, img } = useSelector((state: RootState) => state.userData);
     const dispatch = useDispatch();
 
-    console.log("img " + img);
     return (
         <ScrollView className='flex-1 bg-white p-5'>
 
@@ -114,8 +113,38 @@ const addUser = () => {
                                 selectedValue={selectedProvince}
                                 onValueChange={(itemValue) => setSelectedProvince(itemValue)}
                             >
-                                <Picker.Item label="Java" value="java" />
-                                <Picker.Item label="JavaScript" value="js" />
+                                <Picker.Item label="Azua" value="azua" />
+                                <Picker.Item label="Bahoruco" value="bahoruco" />
+                                <Picker.Item label="Barahona" value="barahona" />
+                                <Picker.Item label="Dajabon" value="dajabon" />
+                                <Picker.Item label="Distrito Nacional" value="distrito_nacional" />
+                                <Picker.Item label="Duarte" value="duarte" />
+                                <Picker.Item label="El Seybo" value="el_seybo" />
+                                <Picker.Item label="Elias Piña" value="elias_pina" />
+                                <Picker.Item label="Espaillat" value="espaillat" />
+                                <Picker.Item label="Hato Mayor" value="hato_mayor" />
+                                <Picker.Item label="Hermanas Mirabal" value="hermanas_mirabal" />
+                                <Picker.Item label="Independencia" value="independencia" />
+                                <Picker.Item label="La Altagracia" value="la_altagracia" />
+                                <Picker.Item label="La Romana" value="la_romana" />
+                                <Picker.Item label="La Vega" value="la_vega" />
+                                <Picker.Item label="Maria Trinidad Sanchez" value="maria_trinidad_sanchez" />
+                                <Picker.Item label="Monseñor Nouel" value="monsenor_nouel" />
+                                <Picker.Item label="Monte Plata" value="monte_plata" />
+                                <Picker.Item label="Montecristi" value="montecristi" />
+                                <Picker.Item label="Pedernales" value="pedernales" />
+                                <Picker.Item label="Peravia" value="peravia" />
+                                <Picker.Item label="Puerto Plata" value="puerto_plata" />
+                                <Picker.Item label="Samana" value="samana" />
+                                <Picker.Item label="San Cristobal" value="san_cristobal" />
+                                <Picker.Item label="San Jose de Ocoa" value="san_jose_de_ocoa" />
+                                <Picker.Item label="San Juan" value="san_juan" />
+                                <Picker.Item label="San Pedro de Macoris" value="san_pedro_de_macoris" />
+                                <Picker.Item label="Sanchez Ramirez" value="sanchez_ramirez" />
+                                <Picker.Item label="Santiago" value="santiago" />
+                                <Picker.Item label="Santiago Rodriguez" value="santiago_rodriguez" />
+                                <Picker.Item label="Santo Domingo" value="santo_domingo" />
+                                <Picker.Item label="Valverde" value="valverde" />
                             </Picker>
                         </View>
                     </View>

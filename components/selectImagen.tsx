@@ -5,28 +5,49 @@ import * as ImagePicker from 'expo-image-picker';
 import { useDispatch } from 'react-redux';
 import { addImg } from '../features/userSlice';
 
-const SelectImagen = ({ isVisible, toggleModal }: any) => {
+
+interface SelectImagenProps {
+    isVisible: boolean;
+    toggleModal: () => void;
+}
+
+const SelectImagen: React.FC<SelectImagenProps> = ({ isVisible, toggleModal }) => {
 
 
 
     const dispatch = useDispatch();
 
+    const openCamera = async () => {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+            alert('Sorry, we need camera permissions to make this work!');
+            return;
+        }
 
-    const camaraPicker = async () => {
-        // const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
-        let permission = await ImagePicker.getCameraPermissionsAsync();
+        const result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
 
-        if (permission.status === 'granted') {
-            let result = await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: true,
-                quality: 1,
-            });
+        if (!result.canceled) {
+            dispatch(addImg(result.assets[0].uri)); // Almacena la URI de la imagen
+            toggleModal(); // Cierra el modal después de seleccionar
+        }
+    };
 
-            if (!result.canceled) {
-                dispatch(addImg(result.assets[0].uri));
-                toggleModal();
-            }
+    const openGallery = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            dispatch(addImg(result.assets[0].uri)); // Almacena la URI de la imagen
+            toggleModal(); // Cierra el modal después de seleccionar
         }
     };
 
@@ -48,10 +69,10 @@ const SelectImagen = ({ isVisible, toggleModal }: any) => {
         <Modal isVisible={isVisible} onBackdropPress={toggleModal}>
             <View style={styles.modalView}>
                 <Text style={styles.title}>Opciones</Text>
-                <TouchableOpacity style={[styles.button, styles.blackButton]} onPress={camaraPicker}>
+                <TouchableOpacity style={[styles.button, styles.blackButton]} onPress={openCamera}>
                     <Text style={styles.blackText}>Tomar Foto</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.button, styles.blackButton]} onPress={pickerImage}>
+                <TouchableOpacity style={[styles.button, styles.blackButton]} onPress={openGallery}>
                     <Text style={styles.blackText}>Elegir de la Galería</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.button, styles.redButton]} onPress={toggleModal}>

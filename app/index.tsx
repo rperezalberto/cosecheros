@@ -1,15 +1,17 @@
 import React, { useEffect } from 'react';
 import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, StyleSheet, Text, View, Button } from 'react-native';
 import { UserIterface } from '../interfaces/userInterfaces';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db, storageCon } from '../firebase/firebaseConfig';
-import { setUserData } from '../features/userSlice';
+import { setUserData, deleteItem, loadUserDataFromAsyncStorage } from '../features/userSlice';
 import { getDownloadURL, ref } from "firebase/storage";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+
 
 export default function App() {
   const { userData } = useSelector((state: RootState) => state.userData);
@@ -18,6 +20,8 @@ export default function App() {
   const RETRY_DELAY = 1000;
 
   useEffect(() => {
+    loadUserDataFromAsyncStorage(dispatch);
+
     const unsub = onSnapshot(collection(db, "users"), async (snapshot) => {
       const usersData = await Promise.all(snapshot.docs.map(async (doc) => {
         const data = doc.data() as UserIterface;
@@ -35,7 +39,7 @@ export default function App() {
                 return fetchImageUrlWithRetries(retries + 1);
               } else {
                 console.error("Error al obtener la URL de la imagen:", error);
-                return null; // Fallback si no se puede obtener la URL
+                return null;
               }
             }
           };
@@ -57,38 +61,45 @@ export default function App() {
 
   const renderItems = ({ item }: { item: UserIterface }) => {
     return (
-      <Link
-        href={{
-          pathname: "/detail",
-          params: { user: JSON.stringify(item) },
-        }}
-        asChild
-      >
-        <Pressable accessibilityLabel={`Cosechero ${item.name}`}>
-          <View className='flex-row items-center pb-5'>
-            <Image
-              style={styles.image}
-              source={item.img ? { uri: item.img } : require("../assets/sheldon.png")}
-              accessibilityLabel={`Imagen de ${item.name}`}
-            />
-            <View className='flex-col pl-3'>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text>{item.id}</Text>
-            </View>
-          </View>
-        </Pressable>
-      </Link>
+      <View>
+        <View className='flex-1 flex-row items-center'>
+          <Link href={{ pathname: "/detail", params: { user: JSON.stringify(item) } }} asChild>
+            <Pressable accessibilityLabel={`Cosechero ${item.name}`}>
+              <View className='flex-row items-center pb-5'>
+                <Image
+                  className='w-20 h-20 rounded-lg'
+                  source={item.img ? { uri: item.img } : require("../assets/sheldon.png")}
+                  accessibilityLabel={`Imagen de ${item.name}`}
+                />
+                <View className='flex-col pl-3'>
+                  <Text className='text-black text-2xl font-bold'>{item.name}</Text>
+                  <Text>{item.province}</Text>
+                  <Text>{item.id}</Text>
+                </View>
+              </View>
+            </Pressable>
+          </Link>
+          <Pressable className='pl-5' onPress={() => dispatch(deleteItem(item.id))}>
+            <MaterialIcons name="delete" size={26} color="red" />
+          </Pressable>
+        </View>
+      </View>
     );
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Listado de Cosecheros</Text>
+    <View className='flex-1 bg-white p-2'>
+      <Text className='text-black text-2xl font-bold p-10 pl-1'>Listado de Cosecheros</Text>
       <FlatList
         data={userData}
         renderItem={renderItems}
         keyExtractor={(item) => item.id.toString()}
-        ListEmptyComponent={() => <Text>No hay datos disponibles</Text>}
+        ListEmptyComponent={() => (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>No hay datos disponibles</Text>
+          </View>
+
+        )}
       />
 
       <Pressable style={styles.addButton} accessibilityLabel="Agregar nuevo cosechero">
@@ -104,25 +115,6 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-    paddingLeft: 8,
-  },
-  title: {
-    marginTop: 40,
-    fontSize: 24,
-    fontWeight: 'bold',
-    paddingBottom: 20,
-  },
-  image: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  name: {
-    fontSize: 24,
-  },
   addButton: {
     position: 'absolute',
     bottom: 40,

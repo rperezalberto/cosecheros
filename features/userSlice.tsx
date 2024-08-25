@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { userData } from '../data/data';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
-import { db } from "../firebase/firebaseConfig";
+import { collection, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { ref, deleteObject } from "firebase/storage";
+import { db, storageCon } from "../firebase/firebaseConfig";
 import { UserIterface } from "../interfaces/userInterfaces";
 
 interface UserState {
@@ -12,7 +12,7 @@ interface UserState {
 }
 
 const initialState: UserState = {
-    userData,
+    userData: [],
     isLoading: false,
     img: "",
 };
@@ -23,23 +23,54 @@ export const userSlice = createSlice({
     reducers: {
         setUserData: (state, action: PayloadAction<UserIterface[]>) => {
             state.userData = action.payload;
-            saveDataToAsyncStorage(state.userData); // Guardar en AsyncStorage
+            saveDataToAsyncStorage(state.userData);
+        },
+
+        updateUserData: (state, action: PayloadAction<UserIterface[]>) => {
+            state.userData = action.payload;
         },
 
         add: (state, action: PayloadAction<UserIterface>) => {
             state.isLoading = true;
             state.userData.push(action.payload);
             addCity(action.payload);
-            saveDataToAsyncStorage(state.userData); // Guardar en AsyncStorage
+            saveDataToAsyncStorage(state.userData);
             state.img = "";
             state.isLoading = false;
         },
 
         addImg: (state, action: PayloadAction<string>) => {
             state.img = action.payload;
+        },
+
+        deleteItem: (state, action: PayloadAction<string>) => {
+            const itemId = action.payload;
+            const itemIndex = state.userData.findIndex(item => item.id === itemId);
+
+            if (itemIndex > -1) {
+                const itemToDelete = state.userData[itemIndex];
+                state.userData.splice(itemIndex, 1);
+                saveDataToAsyncStorage(state.userData);
+
+                deleteCity(itemToDelete.id);
+                if (itemToDelete.img) {
+                    deleteImage(itemToDelete.img);
+                }
+            }
         }
     },
 });
+// Función para agregar un nuevo usuario en Firebase Firestore
+const addCity = async (user: UserIterface) => {
+    try {
+        await setDoc(doc(collection(db, 'users'), user.id), user);
+        console.log('Document successfully written!');
+    } catch (error) {
+        console.error('Error writing document: ', error);
+        throw error;
+    }
+}
+
 
 // Función para guardar `userData` en AsyncStorage
 const saveDataToAsyncStorage = async (userData: UserIterface[]) => {
@@ -52,19 +83,45 @@ const saveDataToAsyncStorage = async (userData: UserIterface[]) => {
     }
 }
 
-// Función para agregar un nuevo usuario en Firebase Firestore
-const addCity = async (user: UserIterface) => {
+export const loadUserDataFromAsyncStorage = async (dispatch: any) => {
     try {
-        await setDoc(doc(collection(db, 'users'), user.id), user);
-        console.log('Document successfully written!');
+        const jsonValue = await AsyncStorage.getItem('@user_data');
+        if (jsonValue != null) {
+            const storedUserData = JSON.parse(jsonValue) as UserIterface[];
+            dispatch(setUserData(storedUserData));
+        }
     } catch (error) {
-        console.error('Error writing document: ', error);
-        throw error;
+        console.error('Error al cargar datos desde AsyncStorage', error);
     }
 }
 
-// Exporta las acciones generadas
-export const { setUserData, add, addImg } = userSlice.actions;
+const deleteCity = async (id: string) => {
+    try {
+        await deleteDoc(doc(db, 'users', id));
+        console.log('Documento eliminado con éxito!');
+    } catch (error) {
+        console.error('Error al eliminar el documento: ', error);
+    }
+}
 
-// Exporta el reducer generado
+const deleteImage = async (imgPath: string) => {
+    try {
+        let pathToDelete = imgPath;
+
+        if (imgPath.startsWith('https://')) {
+            const url = new URL(imgPath);
+            const pathname = url.pathname;
+            pathToDelete = decodeURIComponent(pathname.split('/o/')[1]);
+        }
+
+        const imageRef = ref(storageCon, pathToDelete);
+        await deleteObject(imageRef);
+        console.log('Imagen eliminada con éxito!');
+    } catch (error) {
+        console.error('Error al eliminar la imagen: ', error);
+    }
+}
+
+
+export const { setUserData, updateUserData, add, addImg, deleteItem } = userSlice.actions;
 export default userSlice.reducer;
